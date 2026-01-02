@@ -17,11 +17,12 @@ class Employee(models.Model):
     salaire = models.DecimalField(max_digits=10, decimal_places=2)
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default="Actif")
     
-    # Optional: Link to a generic Django User if needed for login
-    # user = models.OneToOneField('auth.User', on_delete=models.SET_NULL, null=True, blank=True)
+    # Link to the User model for authentication
+    user = models.OneToOneField('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='employee_profile')
 
     def __str__(self):
         return f"{self.nom} {self.prenom}"
+
 
 class LeaveRequest(models.Model):
     STATUT_CHOICES = [

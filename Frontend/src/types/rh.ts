@@ -1,5 +1,6 @@
 // From GestionEmployee.tsx
 export interface Employee {
+    password: string | number | readonly string[];
     id: number;
     code: string;
     nom: string;

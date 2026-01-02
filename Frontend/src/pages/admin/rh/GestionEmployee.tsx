@@ -25,12 +25,30 @@ import { toast } from "sonner";
 import type { Employee } from "@/types/rh";
 
 const mockEmployees: Employee[] = [
-  { id: 1, code: "EMP-2024-0001", nom: "Bennani", prenom: "Ahmed", email: "ahmed.bennani@company.com", poste: "Développeur Senior", departement: "IT", dateEmbauche: "2022-03-15", salaire: 45000, statut: "Actif" },
-  { id: 2, code: "EMP-2024-0002", nom: "Fassi", prenom: "Sara", email: "sara.fassi@company.com", poste: "Gestionnaire RH", departement: "Ressources Humaines", dateEmbauche: "2023-06-01", salaire: 38000, statut: "Actif" },
-  { id: 3, code: "EMP-2024-0003", nom: "Alami", prenom: "Youssef", email: "youssef.alami@company.com", poste: "Designer UX/UI", departement: "Design", dateEmbauche: "2023-01-20", salaire: 35000, statut: "Actif" },
-  { id: 4, code: "EMP-2024-0004", nom: "Zohra", prenom: "Fatima", email: "fatima.zohra@company.com", poste: "Chef de Projet", departement: "Gestion de Projets", dateEmbauche: "2021-09-10", salaire: 42000, statut: "Actif" },
-  { id: 5, code: "EMP-2024-0005", nom: "Fares", prenom: "Jemai", email: "fares.jemai@technics.com", poste: "Automatisme", departement: "Gestion de Projets", dateEmbauche: "2023-11-01", salaire: 40000, statut: "Actif" },
-  { id: 6, code: "EMP-2024-0006", nom: "Choudhury", prenom: "Aisha", email: "aisha.choudhury@company.com", poste: "Directrice Marketing", departement: "Marketing", dateEmbauche: "2020-05-12", salaire: 50000, statut: "En congé" },
+  {
+    id: 1, code: "EMP-2024-0001", nom: "Bennani", prenom: "Ahmed", email: "ahmed.bennani@company.com", poste: "Développeur Senior", departement: "IT", dateEmbauche: "2022-03-15", salaire: 45000, statut: "Actif",
+    password: ""
+  },
+  {
+    id: 2, code: "EMP-2024-0002", nom: "Fassi", prenom: "Sara", email: "sara.fassi@company.com", poste: "Gestionnaire RH", departement: "Ressources Humaines", dateEmbauche: "2023-06-01", salaire: 38000, statut: "Actif",
+    password: ""
+  },
+  {
+    id: 3, code: "EMP-2024-0003", nom: "Alami", prenom: "Youssef", email: "youssef.alami@company.com", poste: "Designer UX/UI", departement: "Design", dateEmbauche: "2023-01-20", salaire: 35000, statut: "Actif",
+    password: ""
+  },
+  {
+    id: 4, code: "EMP-2024-0004", nom: "Zohra", prenom: "Fatima", email: "fatima.zohra@company.com", poste: "Chef de Projet", departement: "Gestion de Projets", dateEmbauche: "2021-09-10", salaire: 42000, statut: "Actif",
+    password: ""
+  },
+  {
+    id: 5, code: "EMP-2024-0005", nom: "Fares", prenom: "Jemai", email: "fares.jemai@technics.com", poste: "Automatisme", departement: "Gestion de Projets", dateEmbauche: "2023-11-01", salaire: 40000, statut: "Actif",
+    password: ""
+  },
+  {
+    id: 6, code: "EMP-2024-0006", nom: "Choudhury", prenom: "Aisha", email: "aisha.choudhury@company.com", poste: "Directrice Marketing", departement: "Marketing", dateEmbauche: "2020-05-12", salaire: 50000, statut: "En congé",
+    password: ""
+  },
 ];
 
 export default function Employee() {
@@ -113,6 +131,8 @@ export default function Employee() {
         code: generateFormCode("RH", "EMPLOYEE"),
         ...data,
         statut: "Actif" // Par défaut actif à la création
+        ,
+        password: ""
       };
       setEmployees([...employees, newEmployee]);
       toast.success(`Employé créé: ${newEmployee.code}`);
@@ -183,7 +203,10 @@ export default function Employee() {
                   <Label htmlFor="poste">Poste</Label>
                   <Input id="poste" name="poste" defaultValue={editingEmployee?.poste} placeholder="Développeur" required />
                 </div>
-
+                <div className="space-y-2">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <Input id="password" name="password" defaultValue={editingEmployee?.password} placeholder="Mot de passe" required />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="departement">Département</Label>
                   <Select name="departement" defaultValue={editingEmployee?.departement || ""} required>

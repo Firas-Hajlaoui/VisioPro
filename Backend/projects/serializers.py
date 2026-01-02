@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Project, ProjectDoc
 
 class ProjectDocSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(source='id', read_only=True)
+    id = serializers.CharField(read_only=True)
 
     class Meta:
         model = ProjectDoc

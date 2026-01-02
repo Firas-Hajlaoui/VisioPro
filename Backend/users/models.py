@@ -8,10 +8,19 @@ class CustomUser(AbstractUser):
         ("manager", "Manager"),
     ]
     
-    # Existing fields in AbstractUser: username, first_name, last_name, email
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="employee")
     departement = models.CharField(max_length=100, blank=True, null=True)
     employee_id = models.CharField(max_length=50, blank=True, null=True, unique=True, help_text="e.g. emp-001")
 
     def __str__(self):
         return self.username
+
+class Notification(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications')
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.user.username}"
