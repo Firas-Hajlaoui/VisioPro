@@ -1,0 +1,74 @@
+-- Adminer 5.4.1 PostgreSQL 16.11 dump
+
+DROP DATABASE IF EXISTS "app";
+CREATE DATABASE "app";
+\connect "app";
+
+DROP TABLE IF EXISTS "CodeCounter";
+DROP SEQUENCE IF EXISTS "CodeCounter_id_seq";
+CREATE SEQUENCE "CodeCounter_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."CodeCounter" (
+    "id" integer DEFAULT nextval('"CodeCounter_id_seq"') NOT NULL,
+    "department" text NOT NULL,
+    "docType" text NOT NULL,
+    "year" integer NOT NULL,
+    "counter" integer DEFAULT '0' NOT NULL,
+    "createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) NOT NULL,
+    CONSTRAINT "CodeCounter_pkey" PRIMARY KEY ("id")
+)
+WITH (oids = false);
+
+CREATE UNIQUE INDEX "CodeCounter_department_docType_year_key" ON public."CodeCounter" USING btree (department, "docType", year);
+
+
+DROP TABLE IF EXISTS "Document";
+DROP SEQUENCE IF EXISTS "Document_id_seq";
+CREATE SEQUENCE "Document_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."Document" (
+    "id" integer DEFAULT nextval('"Document_id_seq"') NOT NULL,
+    "code" text NOT NULL,
+    "nom" text NOT NULL,
+    "type" text NOT NULL,
+    "departement" text NOT NULL,
+    "date" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "taille" text NOT NULL,
+    "minioPath" text,
+    "createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) NOT NULL,
+    CONSTRAINT "Document_pkey" PRIMARY KEY ("id")
+)
+WITH (oids = false);
+
+CREATE UNIQUE INDEX "Document_code_key" ON public."Document" USING btree (code);
+
+
+DROP TABLE IF EXISTS "Employee";
+DROP SEQUENCE IF EXISTS "Employee_id_seq";
+CREATE SEQUENCE "Employee_id_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."Employee" (
+    "id" integer DEFAULT nextval('"Employee_id_seq"') NOT NULL,
+    "code" text NOT NULL,
+    "nom" text NOT NULL,
+    "prenom" text NOT NULL,
+    "email" text NOT NULL,
+    "poste" text NOT NULL,
+    "departement" text NOT NULL,
+    "dateEmbauche" timestamp(3) NOT NULL,
+    "salaire" double precision NOT NULL,
+    "statut" text DEFAULT 'Actif' NOT NULL,
+    "createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) NOT NULL,
+    CONSTRAINT "Employee_pkey" PRIMARY KEY ("id")
+)
+WITH (oids = false);
+
+CREATE UNIQUE INDEX "Employee_code_key" ON public."Employee" USING btree (code);
+
+CREATE UNIQUE INDEX "Employee_email_key" ON public."Employee" USING btree (email);
+
+
+-- 2025-12-30 10:51:02 UT
