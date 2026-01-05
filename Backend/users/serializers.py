@@ -11,6 +11,17 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'firstName', 'lastName', 'email', 'role', 'departement']
 
 class NotificationSerializer(serializers.ModelSerializer):
+    subject = serializers.CharField(source='title', read_only=True)
+    recipientNames = serializers.SerializerMethodField(read_only=True)
+    sentAt = serializers.DateTimeField(source='created_at', read_only=True)
+    sender = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Notification
-        fields = ['id', 'user', 'title', 'message', 'read', 'created_at']
+        fields = ['id', 'subject', 'message', 'recipientNames', 'sentAt', 'sender', 'read', 'created_at']
+
+    def get_recipientNames(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}"
+
+    def get_sender(self, obj):
+        return "System"

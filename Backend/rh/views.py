@@ -1,17 +1,17 @@
 from rest_framework import viewsets
-from .models import Employee, LeaveRequest, TimeRecord, ExpenseReport, Authorization
+from .models import Employee, LeaveRequest, TimeRecord, ExpenseReport, Authorization, TrainingSession
 from .serializers import (
     EmployeeSerializer, LeaveRequestSerializer, TimeRecordSerializer,
-    ExpenseReportSerializer, AuthorizationSerializer
+    ExpenseReportSerializer, AuthorizationSerializer, TrainingSessionSerializer
 )
 from users.permissions import IsAdmin, IsManager, IsEmployee, IsOwnerOrReadOnly
 
 class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
-    # Admin and Manager can manage employees. 
+    # Admin and Manager can manage employees.
     # Regular employees can maybe view only (or implemented differently)
-    permission_classes = [IsManager] 
+    permission_classes = [IsManager]
 
 class LeaveRequestViewSet(viewsets.ModelViewSet):
     queryset = LeaveRequest.objects.all()
@@ -67,3 +67,8 @@ class AuthorizationViewSet(viewsets.ModelViewSet):
         if hasattr(user, 'employee_profile'):
              return Authorization.objects.filter(employe=user.employee_profile)
         return Authorization.objects.none()
+
+class TrainingSessionViewSet(viewsets.ModelViewSet):
+    queryset = TrainingSession.objects.all()
+    serializer_class = TrainingSessionSerializer
+    permission_classes = [IsEmployee]

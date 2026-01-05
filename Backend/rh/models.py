@@ -1,4 +1,5 @@
 from django.db import models
+from .models_extra import TrainingSession
 
 class Employee(models.Model):
     STATUT_CHOICES = [

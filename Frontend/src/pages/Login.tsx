@@ -5,54 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [email, setEmail] = useState("");
+  const { login, isLoading } = useAuth();
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState<"admin" | "employee">("admin");
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email || !password) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs",
-        variant: "destructive",
-      });
+
+    if (!username || !password) {
+      toast.error("Veuillez remplir tous les champs");
       return;
     }
 
-    setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      // Mock authentication - in production, this would be a real API call
-      if (email && password.length >= 6) {
-        toast({
-          title: "Succès",
-          description: `Connexion réussie en tant que ${userType === "admin" ? "Admin" : "Employé"}`,
-        });
-        
-        // Redirect based on user type
-        if (userType === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/employee");
-        }
-      } else {
-        toast({
-          title: "Erreur",
-          description: "Email ou mot de passe invalide",
-          variant: "destructive",
-        });
-      }
-      setIsLoading(false);
-    }, 1000);
+    try {
+      await login(username, password);
+      toast.success("Connexion réussie");
+      navigate("/admin");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Échec de la connexion");
+    }
   };
 
   return (
@@ -82,45 +58,19 @@ export default function Login() {
 
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-6">
-              {/* User Type Selector */}
-              <div className="flex gap-3 mb-6 p-3 bg-gray-50 rounded-lg">
-                <button
-                  type="button"
-                  onClick={() => setUserType("admin")}
-                  className={`flex-1 py-2 px-3 rounded-md font-medium text-sm transition-colors ${
-                    userType === "admin"
-                      ? "bg-blue-500 text-white shadow-md"
-                      : "text-gray-600 hover:text-gray-900 bg-white"
-                  }`}
-                >
-                  Admin
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUserType("employee")}
-                  className={`flex-1 py-2 px-3 rounded-md font-medium text-sm transition-colors ${
-                    userType === "employee"
-                      ? "bg-blue-500 text-white shadow-md"
-                      : "text-gray-600 hover:text-gray-900 bg-white"
-                  }`}
-                >
-                  Employé
-                </button>
-              </div>
-
               {/* Email Input */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700 font-medium">
-                  Adresse Email
+                <Label htmlFor="username" className="text-gray-700 font-medium">
+                  Nom d'utilisateur
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="vous@exemple.fr"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="username"
+                    type="text"
+                    placeholder="vous"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="pl-10 h-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                     disabled={isLoading}
                   />
@@ -172,8 +122,8 @@ export default function Login() {
             {/* Demo Credentials */}
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
               <p className="text-xs font-semibold text-gray-700 mb-2">Identifiants de démonstration:</p>
-              <p className="text-xs text-gray-600 mb-1"><span className="font-medium">Email:</span> demo@visiopro.fr</p>
-              <p className="text-xs text-gray-600"><span className="font-medium">Mot de passe:</span> demo123</p>
+              <p className="text-xs text-gray-600 mb-1"><span className="font-medium">Nom d'utilisateur:</span> admin</p>
+              <p className="text-xs text-gray-600"><span className="font-medium">Mot de passe:</span> admin123</p>
             </div>
           </CardContent>
         </Card>
