@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Employee, LeaveRequest, TimeRecord, ExpenseReport, Authorization
+from .models import Employee, LeaveRequest, TimeRecord, ExpenseReport, Authorization, TrainingSession
 from django.contrib.auth import get_user_model
 from django.db import transaction
 
@@ -12,22 +12,22 @@ class EmployeeSerializer(serializers.ModelSerializer):
         model = Employee
         fields = '__all__'
         extra_kwargs = {'user': {'read_only': True}}
-    
+
     def create(self, validated_data):
         password = validated_data.pop('password', None)
         with transaction.atomic():
             employee = Employee.objects.create(**validated_data)
-            
+
             # Create a corresponding User if password is provided or auto-generate one
             if password:
                 username = normalized_username = f"{employee.prenom.lower()}.{employee.nom.lower()}"
-                
+
                 # Check uniqueness of username
                 counter = 1
                 while User.objects.filter(username=username).exists():
                     username = f"{normalized_username}{counter}"
                     counter += 1
-                
+
                 user = User.objects.create_user(
                     username=username,
                     email=employee.email,
@@ -40,11 +40,11 @@ class EmployeeSerializer(serializers.ModelSerializer):
                 )
                 employee.user = user
                 employee.save()
-                
+
         return employee
 
 class LeaveRequestSerializer(serializers.ModelSerializer):
-    employe = serializers.StringRelatedField() 
+    employe = serializers.StringRelatedField()
 
     class Meta:
         model = LeaveRequest
@@ -70,3 +70,8 @@ class AuthorizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Authorization
         fields = ['id', 'code', 'employe', 'date', 'duree', 'type', 'motif', 'statut']
+
+class TrainingSessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrainingSession
+        fields = '__all__'

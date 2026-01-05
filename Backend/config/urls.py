@@ -12,7 +12,7 @@ from rest_framework_simplejwt.views import (
 from users.views import UserViewSet, NotificationViewSet
 from rh.views import (
     EmployeeViewSet, LeaveRequestViewSet, TimeRecordViewSet,
-    ExpenseReportViewSet, AuthorizationViewSet
+    ExpenseReportViewSet, AuthorizationViewSet, TrainingSessionViewSet
 )
 from projects.views import ProjectViewSet, ProjectDocViewSet
 
@@ -36,13 +36,14 @@ router.register(r'leaves', LeaveRequestViewSet)
 router.register(r'time-records', TimeRecordViewSet)
 router.register(r'expenses', ExpenseReportViewSet)
 router.register(r'authorizations', AuthorizationViewSet)
+router.register(r'training-sessions', TrainingSessionViewSet)
 router.register(r'projects', ProjectViewSet)
 router.register(r'project-docs', ProjectDocViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    
+
     # JWT Authentication
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

@@ -1,34 +1,42 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-import { AuthUser, AuthContextType, UserRole } from "@/types/auth";
+import { AuthUser, AuthContextType } from "@/types/auth";
+import { apiClient } from "@/lib/api";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load user from localStorage on mount
+  // Load user from localStorage on mount and fetch user data
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
+    const loadUser = async () => {
       try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        localStorage.removeItem("user");
+        if (apiClient.isAuthenticated()) {
+          const userData = await apiClient.get('/users/me/');
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error('Failed to load user:', error);
+        apiClient.logout();
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+
+    loadUser();
   }, []);
 
-  const login = (email: string, password: string, role: UserRole) => {
-    // Mock authentication - in production, this would be a real API call
-    const newUser: AuthUser = { email, role };
-    setUser(newUser);
-    localStorage.setItem("user", JSON.stringify(newUser));
+  const login = async (username: string, password: string) => {
+    await apiClient.login({ username, password });
+    const userData = await apiClient.get('/users/me/');
+    setUser(userData);
   };
 
   const logout = () => {
+    apiClient.logout();
     setUser(null);
-    localStorage.removeItem("user");
   };
 
   return (
@@ -36,6 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         isAuthenticated: !!user,
+        isLoading,
         login,
         logout,
       }}
