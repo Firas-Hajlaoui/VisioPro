@@ -18,10 +18,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           // Validate token by fetching current user
           const response = await api.get("/auth/me/");
-          setUser(response.data);
-
+          const userData = response.data.data || response.data;
+          setUser(userData);
+          
           // Update stored user with fresh data
-          localStorage.setItem("user", JSON.stringify(response.data));
+          localStorage.setItem("user", JSON.stringify(userData));
         } catch (error) {
           // Token is invalid, clear everything
           console.error("Failed to validate token:", error);
@@ -42,8 +43,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ...(role && { role }),
       });
 
-      const { user: userData, tokens } = response.data;
-
+      // Backend wraps response in success_response() so data is nested
+      const { user: userData, tokens } = response.data.data || response.data;
+      
       // Store tokens and user data
       setTokens(tokens.access, tokens.refresh);
       setUser(userData);
@@ -59,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       const refreshToken = localStorage.getItem("refresh_token");
-
+      
       if (refreshToken) {
         // Call logout endpoint to blacklist token
         await api.post("/auth/logout/", { refresh: refreshToken });
