@@ -65,6 +65,29 @@ class TimeRecordViewSet(viewsets.ModelViewSet):
     search_fields = ['code', 'employee__nom', 'employee__prenom']
     ordering_fields = ['date', 'created_at']
     ordering = ['-date']
+    
+    @extend_schema(
+        summary='Validate time record',
+        tags=['HR - Time Records']
+    )
+    @action(detail=True, methods=['patch'], url_path='validate')
+    def validate_record(self, request, pk=None):
+        """Validate time record."""
+        time_record = self.get_object()
+        hs_valide = request.data.get('hsValide', request.data.get('hs_valide', False))
+        notes = request.data.get('notes', '')
+        
+        time_record.hs_valide = hs_valide
+        time_record.statut = 'Validé' if hs_valide else 'En attente'
+        time_record.save()
+        
+        serializer = self.get_serializer(time_record)
+        return Response({
+            'success': True,
+            'data': serializer.data,
+            'message': 'Time record validated',
+            'errors': None
+        })
 
 
 class LeaveRequestViewSet(viewsets.ModelViewSet):
@@ -116,6 +139,36 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
             'success': True,
             'data': serializer.data,
             'message': 'Leave request rejected',
+            'errors': None
+        })
+    
+    @extend_schema(
+        summary='Update leave request status',
+        tags=['HR - Leave Requests']
+    )
+    @action(detail=True, methods=['patch'], url_path='status')
+    def update_status(self, request, pk=None):
+        """Update leave request status (approve/reject)."""
+        leave_request = self.get_object()
+        statut = request.data.get('statut')
+        notes = request.data.get('notes', '')
+        
+        if statut not in ['Approuvé', 'Refusé']:
+            return Response({
+                'success': False,
+                'data': None,
+                'message': 'Invalid status',
+                'errors': {'statut': 'Must be Approuvé or Refusé'}
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        leave_request.statut = statut
+        leave_request.save()
+        
+        serializer = self.get_serializer(leave_request)
+        return Response({
+            'success': True,
+            'data': serializer.data,
+            'message': f'Leave request {statut.lower()}',
             'errors': None
         })
 
@@ -171,6 +224,36 @@ class AuthorizationViewSet(viewsets.ModelViewSet):
             'message': 'Authorization rejected',
             'errors': None
         })
+    
+    @extend_schema(
+        summary='Update authorization status',
+        tags=['HR - Authorizations']
+    )
+    @action(detail=True, methods=['patch'], url_path='status')
+    def update_status(self, request, pk=None):
+        """Update authorization status (approve/reject)."""
+        authorization = self.get_object()
+        statut = request.data.get('statut')
+        notes = request.data.get('notes', '')
+        
+        if statut not in ['Approuvé', 'Refusé']:
+            return Response({
+                'success': False,
+                'data': None,
+                'message': 'Invalid status',
+                'errors': {'statut': 'Must be Approuvé or Refusé'}
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        authorization.statut = statut
+        authorization.save()
+        
+        serializer = self.get_serializer(authorization)
+        return Response({
+            'success': True,
+            'data': serializer.data,
+            'message': f'Authorization {statut.lower()}',
+            'errors': None
+        })
 
 
 class ExpenseReportViewSet(viewsets.ModelViewSet):
@@ -222,5 +305,39 @@ class ExpenseReportViewSet(viewsets.ModelViewSet):
             'success': True,
             'data': serializer.data,
             'message': 'Expense report rejected',
+            'errors': None
+        })
+    
+    @extend_schema(
+        summary='Update expense report status',
+        tags=['HR - Expense Reports']
+    )
+    @action(detail=True, methods=['patch'], url_path='status')
+    def update_status(self, request, pk=None):
+        """Update expense report status (validate/reject)."""
+        expense = self.get_object()
+        statut = request.data.get('statut')
+        notes = request.data.get('notes', '')
+        montant_autorise = request.data.get('montantAutorise', request.data.get('montant_autorise'))
+        
+        if statut not in ['Validé', 'Refusé']:
+            return Response({
+                'success': False,
+                'data': None,
+                'message': 'Invalid status',
+                'errors': {'statut': 'Must be Validé or Refusé'}
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        expense.statut = statut
+        # Optionally update montant if montant_autorise is provided
+        if montant_autorise is not None:
+            expense.montant = montant_autorise
+        expense.save()
+        
+        serializer = self.get_serializer(expense)
+        return Response({
+            'success': True,
+            'data': serializer.data,
+            'message': f'Expense report {statut.lower()}',
             'errors': None
         })

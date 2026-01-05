@@ -92,6 +92,59 @@ class NotificationViewSet(viewsets.ModelViewSet):
             'errors': None
         })
     
+    @action(detail=False, methods=['post'])
+    def mark_all_as_read(self, request):
+        """Mark all notifications as read for the current user."""
+        user = request.user
+        notifications = self.get_queryset()
+        
+        updated_count = 0
+        for notification in notifications:
+            read_status, created = NotificationReadStatus.objects.get_or_create(
+                notification=notification,
+                user=user,
+                defaults={'read': True, 'read_at': timezone.now()}
+            )
+            
+            if not created and not read_status.read:
+                read_status.read = True
+                read_status.read_at = timezone.now()
+                read_status.save()
+                updated_count += 1
+            elif created:
+                updated_count += 1
+        
+        return Response({
+            'success': True,
+            'data': {'marked_as_read': updated_count},
+            'message': f'{updated_count} notifications marked as read',
+            'errors': None
+        })
+    
+    @action(detail=False, methods=['get'])
+    def unread_count(self, request):
+        """Get count of unread notifications for current user."""
+        user = request.user
+        notifications = self.get_queryset()
+        
+        # Count notifications without read status or with read=False
+        unread = 0
+        for notification in notifications:
+            read_status = NotificationReadStatus.objects.filter(
+                notification=notification,
+                user=user
+            ).first()
+            
+            if not read_status or not read_status.read:
+                unread += 1
+        
+        return Response({
+            'success': True,
+            'data': {'count': unread},
+            'message': 'Unread count retrieved successfully',
+            'errors': None
+        })
+    
     def perform_create(self, serializer):
         """Set the sender to the current user when creating a notification."""
         serializer.save(sender=self.request.user)

@@ -36,54 +36,56 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Root redirect to login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Root redirect to login */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
 
-          {/* Login Page */}
-          <Route path="/login" element={<Login />} />
+            {/* Login Page */}
+            <Route path="/login" element={<Login />} />
 
-          {/* Employee Portal - With AppLayout */}
-          <Route path="/employee/*" element={
-            <AppLayoutEmp>
-              <Routes>
-                <Route path="/" element={<EmployeeDashboard />} />
-                <Route path="/rh/temps" element={<EmployeeTempsPage />} />
-                <Route path="/rh/conges" element={<EmployeeCongesPage />} />
-                <Route path="/rh/autorisations" element={<EmployeeAutorisationsPage />} />
-                <Route path="/rh/frais" element={<EmployeeNoteFraisPage />} />
-                <Route path="/fiche-intervention" element={<FicheInterventionPage />} />
-                <Route path="/projets" element={<EmployeeProjetsPage />} />
+            {/* Employee Portal - With AppLayout */}
+            <Route path="/employee/*" element={
+              <AppLayoutEmp>
+                <Routes>
+                  <Route path="/" element={<EmployeeDashboard />} />
+                  <Route path="/rh/temps" element={<EmployeeTempsPage />} />
+                  <Route path="/rh/conges" element={<EmployeeCongesPage />} />
+                  <Route path="/rh/autorisations" element={<EmployeeAutorisationsPage />} />
+                  <Route path="/rh/frais" element={<EmployeeNoteFraisPage />} />
+                  <Route path="/fiche-intervention" element={<FicheInterventionPage />} />
+                  <Route path="/projets" element={<EmployeeProjetsPage />} />
 
-                <Route path="*" element={<NotFound />} />
+                  <Route path="*" element={<NotFound />} />
 
-              </Routes>
-            </AppLayoutEmp>
-          } />
+                </Routes>
+              </AppLayoutEmp>
+            } />
 
-          {/* Admin/Manager Portal - With AppLayout */}
-          <Route path="admin/*" element={
-            <AppLayout>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/rh/employe" element={<Employee />} />
-                <Route path="/rh/temps" element={<TempsPage />} />
-                <Route path="/rh/conges" element={<CongesPage />} />
-                <Route path="/rh/autorisations" element={<AutorisationsPage />} />
-                <Route path="/rh/frais" element={<NoteFraisPage />} />
-                <Route path="/formation" element={<FormationPage />} />
-                <Route path="/ingenierie" element={<IngenieriePage />} />
-                <Route path="/projets" element={<ProjetsPage />} />
-                <Route path="/documents" element={<DocumentsPage />} />
-                <Route path="/notifications" element={<NotificationsPage />} />
-                <Route path="/parametres" element={<ParametresPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AppLayout>
-          } />
-        </Routes>
-      </BrowserRouter>
+            {/* Admin/Manager Portal - With AppLayout */}
+            <Route path="admin/*" element={
+              <AppLayout>
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/rh/employe" element={<Employee />} />
+                  <Route path="/rh/temps" element={<TempsPage />} />
+                  <Route path="/rh/conges" element={<CongesPage />} />
+                  <Route path="/rh/autorisations" element={<AutorisationsPage />} />
+                  <Route path="/rh/frais" element={<NoteFraisPage />} />
+                  <Route path="/formation" element={<FormationPage />} />
+                  <Route path="/ingenierie" element={<IngenieriePage />} />
+                  <Route path="/projets" element={<ProjetsPage />} />
+                  <Route path="/documents" element={<DocumentsPage />} />
+                  <Route path="/notifications" element={<NotificationsPage />} />
+                  <Route path="/parametres" element={<ParametresPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </AppLayout>
+            } />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

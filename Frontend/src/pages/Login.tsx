@@ -6,18 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
+import { UserRole } from "@/types/auth";
 
 export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState<"admin" | "employee">("admin");
+  const [userType, setUserType] = useState<UserRole>("admin");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       toast({
         title: "Erreur",
@@ -28,31 +31,31 @@ export default function Login() {
     }
 
     setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      // Mock authentication - in production, this would be a real API call
-      if (email && password.length >= 6) {
-        toast({
-          title: "Succès",
-          description: `Connexion réussie en tant que ${userType === "admin" ? "Admin" : "Employé"}`,
-        });
-        
-        // Redirect based on user type
-        if (userType === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/employee");
-        }
+
+    try {
+      // Call real API through AuthContext
+      await login(email, password, userType);
+
+      toast({
+        title: "Succès",
+        description: `Connexion réussie en tant que ${userType === "admin" ? "Admin" : userType === "manager" ? "Manager" : "Employé"}`,
+      });
+
+      // Redirect based on user type
+      if (userType === "admin" || userType === "manager") {
+        navigate("/admin");
       } else {
-        toast({
-          title: "Erreur",
-          description: "Email ou mot de passe invalide",
-          variant: "destructive",
-        });
+        navigate("/employee");
       }
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Email ou mot de passe invalide",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -87,22 +90,20 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setUserType("admin")}
-                  className={`flex-1 py-2 px-3 rounded-md font-medium text-sm transition-colors ${
-                    userType === "admin"
+                  className={`flex-1 py-2 px-3 rounded-md font-medium text-sm transition-colors ${userType === "admin"
                       ? "bg-blue-500 text-white shadow-md"
                       : "text-gray-600 hover:text-gray-900 bg-white"
-                  }`}
+                    }`}
                 >
                   Admin
                 </button>
                 <button
                   type="button"
                   onClick={() => setUserType("employee")}
-                  className={`flex-1 py-2 px-3 rounded-md font-medium text-sm transition-colors ${
-                    userType === "employee"
+                  className={`flex-1 py-2 px-3 rounded-md font-medium text-sm transition-colors ${userType === "employee"
                       ? "bg-blue-500 text-white shadow-md"
                       : "text-gray-600 hover:text-gray-900 bg-white"
-                  }`}
+                    }`}
                 >
                   Employé
                 </button>
