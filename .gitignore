@@ -1,0 +1,209 @@
+# Ignore all files in the Backend/venv directory
+Backend/venv/*
+# Ignore all __pycache__ directories
+**/__pycache__/
+
+# Ignore all migrations directories
+**/migrations/
+# Ignore all .pyc files
+*.pyc
+
+# Ignore all files in the Frontend/node_modules directory
+Frontend/node_modules/*
+
+# Ignore all files in the Frontend/.next directory
+Frontend/.next/*
+
+# Ignore all files in the Frontend/.vscode directory
+Frontend/.vscode/*
+
+# Ignore all files in the Frontend/public directory
+Frontend/public/*
+
+# Ignore all files in the Frontend/src directory
+Frontend/src/*
+
+# Ignore all files in the Frontend/src/components directory
+Frontend/src/components/*
+
+# Ignore all files in the Frontend/src/pages directory
+Frontend/src/pages/*
+
+# Ignore all files in the Frontend/src/styles directory
+Frontend/src/styles/*
+
+# Ignore all files in the Frontend/src/utils directory
+Frontend/src/utils/*
+
+# Ignore all files in the Frontend/src/lib directory
+Frontend/src/lib/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all files in the Frontend/src/app directory
+Frontend/src/app/*
+
+# Ignore all
