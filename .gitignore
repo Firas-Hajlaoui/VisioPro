@@ -2,7 +2,7 @@
 .DS_Store
 Thumbs.db
 .env
-.env.*
+
 
 # Python / Django
 __pycache__/
@@ -33,10 +33,6 @@ env/
 ENV/
 Backend/venv/
 
-# Database
-*.sqlite3
-db.sqlite3
-Backend/db.sqlite3
 
 # Django
 *.log
