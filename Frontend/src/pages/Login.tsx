@@ -1,16 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Building2, Mail, Lock, ArrowRight } from "lucide-react";
+import { Building2, User, Lock, ArrowRight } from "lucide-react"; // Changed Mail to User
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [email, setEmail] = useState("");
+  const { login } = useAuth();
+  
+  // Changed state from email to username
+  const [username, setUsername] = useState(""); 
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState<"admin" | "employee">("admin");
   const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +22,8 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
+    // Check username instead of email
+    if (!username || !password) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs",
@@ -29,30 +34,29 @@ export default function Login() {
 
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      // Mock authentication - in production, this would be a real API call
-      if (email && password.length >= 6) {
-        toast({
-          title: "Succès",
-          description: `Connexion réussie en tant que ${userType === "admin" ? "Admin" : "Employé"}`,
-        });
-        
-        // Redirect based on user type
-        if (userType === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/employee");
-        }
+    // Pass username to login function
+    const result = await login(username, password, userType);
+
+    if (result.success) {
+      toast({
+        title: "Succès",
+        description: `Connexion réussie en tant que ${userType === "admin" ? "Admin" : "Employé"}`,
+      });
+      
+      if (userType === "admin") {
+        navigate("/admin");
       } else {
-        toast({
-          title: "Erreur",
-          description: "Email ou mot de passe invalide",
-          variant: "destructive",
-        });
+        navigate("/employee");
       }
-      setIsLoading(false);
-    }, 1000);
+    } else {
+      toast({
+        title: "Échec de la connexion",
+        description: result.error instanceof Error ? result.error.message : "Identifiant ou mot de passe invalide",
+        variant: "destructive",
+      });
+    }
+    
+    setIsLoading(false);
   };
 
   return (
@@ -108,21 +112,23 @@ export default function Login() {
                 </button>
               </div>
 
-              {/* Email Input */}
+              {/* Username Input (Changed from Email) */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700 font-medium">
-                  Adresse Email
+                <Label htmlFor="username" className="text-gray-700 font-medium">
+                  Nom d'utilisateur
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="vous@exemple.fr"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="username"
+                    type="text"
+                    placeholder="ex: jdupont"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="pl-10 h-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                     disabled={isLoading}
+                    autoComplete="username"
+                    required
                   />
                 </div>
               </div>
@@ -142,6 +148,8 @@ export default function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10 h-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                     disabled={isLoading}
+                    autoComplete="current-password"
+                    required
                   />
                 </div>
               </div>
@@ -158,7 +166,7 @@ export default function Login() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Connexion en cours...
+                    Connexion...
                   </span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
@@ -172,7 +180,7 @@ export default function Login() {
             {/* Demo Credentials */}
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
               <p className="text-xs font-semibold text-gray-700 mb-2">Identifiants de démonstration:</p>
-              <p className="text-xs text-gray-600 mb-1"><span className="font-medium">Email:</span> demo@visiopro.fr</p>
+              <p className="text-xs text-gray-600 mb-1"><span className="font-medium">Identifiant:</span> demo</p>
               <p className="text-xs text-gray-600"><span className="font-medium">Mot de passe:</span> demo123</p>
             </div>
           </CardContent>

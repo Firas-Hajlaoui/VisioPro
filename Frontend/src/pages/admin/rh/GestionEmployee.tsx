@@ -21,40 +21,19 @@ import {
 } from "lucide-react";
 import { generateFormCode } from "@/lib/codification";
 import { toast } from "sonner";
+import { useEmployees, useLogin } from "@/hooks/useApi"; // Use real API hook
 
 import type { Employee } from "@/types/rh";
 
-const mockEmployees: Employee[] = [
-  {
-    id: 1, code: "EMP-2024-0001", nom: "Bennani", prenom: "Ahmed", email: "ahmed.bennani@company.com", poste: "Développeur Senior", departement: "IT", dateEmbauche: "2022-03-15", salaire: 45000, statut: "Actif",
-    password: ""
-  },
-  {
-    id: 2, code: "EMP-2024-0002", nom: "Fassi", prenom: "Sara", email: "sara.fassi@company.com", poste: "Gestionnaire RH", departement: "Ressources Humaines", dateEmbauche: "2023-06-01", salaire: 38000, statut: "Actif",
-    password: ""
-  },
-  {
-    id: 3, code: "EMP-2024-0003", nom: "Alami", prenom: "Youssef", email: "youssef.alami@company.com", poste: "Designer UX/UI", departement: "Design", dateEmbauche: "2023-01-20", salaire: 35000, statut: "Actif",
-    password: ""
-  },
-  {
-    id: 4, code: "EMP-2024-0004", nom: "Zohra", prenom: "Fatima", email: "fatima.zohra@company.com", poste: "Chef de Projet", departement: "Gestion de Projets", dateEmbauche: "2021-09-10", salaire: 42000, statut: "Actif",
-    password: ""
-  },
-  {
-    id: 5, code: "EMP-2024-0005", nom: "Fares", prenom: "Jemai", email: "fares.jemai@technics.com", poste: "Automatisme", departement: "Gestion de Projets", dateEmbauche: "2023-11-01", salaire: 40000, statut: "Actif",
-    password: ""
-  },
-  {
-    id: 6, code: "EMP-2024-0006", nom: "Choudhury", prenom: "Aisha", email: "aisha.choudhury@company.com", poste: "Directrice Marketing", departement: "Marketing", dateEmbauche: "2020-05-12", salaire: 50000, statut: "En congé",
-    password: ""
-  },
-];
+// Mock data removed in favor of real API (or kept as fallback/initial state if API not ready, but we want to use API correctly)
+// But for now, since we don't have infinite time to refactor everything to useQuery fully if structure differs, 
+// I will adapt the component to use the useEmployees hook.
 
-export default function Employee() {
+// Checking existing component: it uses local state `employees`.
+// I should replace this with `useEmployees` query data.
+
+export default function EmployeePage() {
   const [open, setOpen] = useState(false);
-  const [employees, setEmployees] = useState<Employee[]>(mockEmployees);
-  // État pour savoir si on édite un employé (null = création)
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
 
   // --- États pour les filtres ---
@@ -62,7 +41,17 @@ export default function Employee() {
   const [filterDept, setFilterDept] = useState("tous");
   const [filterStatus, setFilterStatus] = useState("tous");
 
-  // --- Logique de filtrage ---
+  // API Hooks
+  const { data, isLoading, error, createEmployee, updateEmployee, deleteEmployee } = useEmployees({
+    // We could pass filter params here correctly if backend supports them directly 
+    // but for now client side filtering seems to be what was implemented.
+    // If we implement client side filtering on full list, we need full list. 
+    // Pagination logic might be needed.
+  });
+
+  const employees = data?.results || []; // API returns PaginatedResponse
+
+  // --- Logique de filtrage Client Side (temporaire si API ne filtre pas tout) ---
   const filteredEmployees = employees.filter((emp) => {
     const searchText = filterText.toLowerCase();
     const matchText =
@@ -94,8 +83,7 @@ export default function Employee() {
   // --- Gestion de la Suppression ---
   const handleDelete = (id: number) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer cet employé ?")) {
-      setEmployees(employees.filter(e => e.id !== id));
-      toast.success("Employé supprimé avec succès");
+      deleteEmployee(id);
     }
   };
 
@@ -103,39 +91,27 @@ export default function Employee() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const salaireNum = parseFloat(formData.get("salaire") as string);
 
     // Récupération des données communes
-    const data = {
+    const dataForm = {
       nom: formData.get("nom") as string,
       prenom: formData.get("prenom") as string,
       email: formData.get("email") as string,
       poste: formData.get("poste") as string,
       departement: formData.get("departement") as string,
       dateEmbauche: formData.get("dateEmbauche") as string,
-      salaire: parseFloat(formData.get("salaire") as string),
-      statut: (formData.get("statut") as any) || "Actif", // On permet de modifier le statut
+      salaire: isNaN(salaireNum) ? "0.00" : salaireNum.toFixed(2), // Convert to string decimal
+      statut: (formData.get("statut") as any) || "Actif",
+      code: editingEmployee?.code || generateFormCode("RH", "EMPLOYEE") // Keep existing code or generate new
     };
 
     if (editingEmployee) {
       // MODE MODIFICATION
-      setEmployees(prev => prev.map(emp =>
-        emp.id === editingEmployee.id
-          ? { ...emp, ...data }
-          : emp
-      ));
-      toast.success(`Employé modifié: ${editingEmployee.code}`);
+      updateEmployee({ ...editingEmployee, ...dataForm });
     } else {
       // MODE CRÉATION
-      const newEmployee: Employee = {
-        id: employees.length > 0 ? Math.max(...employees.map(e => e.id)) + 1 : 1,
-        code: generateFormCode("RH", "EMPLOYEE"),
-        ...data,
-        statut: "Actif" // Par défaut actif à la création
-        ,
-        password: ""
-      };
-      setEmployees([...employees, newEmployee]);
-      toast.success(`Employé créé: ${newEmployee.code}`);
+      createEmployee(dataForm);
     }
 
     setOpen(false);
@@ -146,6 +122,9 @@ export default function Employee() {
     if (statut === "En congé") return "secondary";
     return "destructive";
   };
+
+  if (isLoading) return <div className="p-8">Chargement...</div>;
+  if (error) return <div className="p-8 text-red-500">Erreur: {error.message}</div>;
 
   return (
     <div className="space-y-6 p-2 sm:p-4 md:p-6 pb-20 sm:pb-10">
@@ -180,8 +159,6 @@ export default function Employee() {
                 </DialogDescription>
               </DialogHeader>
 
-              {/* Le key est important : il force React à recréer le formulaire quand on change d'employé ou de mode,
-                  ce qui permet aux defaultValue de se mettre à jour correctement. */}
               <form key={editingEmployee ? editingEmployee.id : 'new'} onSubmit={handleSubmit} className="space-y-4 py-2">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -203,10 +180,14 @@ export default function Employee() {
                   <Label htmlFor="poste">Poste</Label>
                   <Input id="poste" name="poste" defaultValue={editingEmployee?.poste} placeholder="Développeur" required />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <Input id="password" name="password" defaultValue={editingEmployee?.password} placeholder="Mot de passe" required />
-                </div>
+                {/* Password field removed/hidden for edit, or separate handling needed for API. API requires it for creation but not update maybe? */}
+                {!editingEmployee && (
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Mot de passe</Label>
+                    <Input id="password" name="password" placeholder="Mot de passe" required />
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label htmlFor="departement">Département</Label>
                   <Select name="departement" defaultValue={editingEmployee?.departement || ""} required>
@@ -235,7 +216,6 @@ export default function Employee() {
                   </div>
                 </div>
 
-                {/* Champ Statut visible uniquement en mode édition */}
                 {editingEmployee && (
                   <div className="space-y-2">
                     <Label htmlFor="statut">Statut</Label>
@@ -282,7 +262,7 @@ export default function Employee() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Masse Salariale</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(employees.reduce((sum, e) => sum + e.salaire, 0) / 1000).toFixed(0)}K <span className="text-sm font-normal text-muted-foreground">DT</span></div>
+            <div className="text-2xl font-bold">{(employees.reduce((sum, e) => sum + parseFloat(e.salaire || "0"), 0) / 1000).toFixed(0)}K <span className="text-sm font-normal text-muted-foreground">DT</span></div>
             <p className="text-xs text-muted-foreground">Par mois</p>
           </CardContent>
         </Card>
@@ -393,7 +373,7 @@ export default function Employee() {
                       <TableCell className="text-muted-foreground text-sm">{employee.email}</TableCell>
                       <TableCell>{employee.poste}</TableCell>
                       <TableCell>{employee.departement}</TableCell>
-                      <TableCell className="text-right font-mono">{employee.salaire.toLocaleString()} DT</TableCell>
+                      <TableCell className="text-right font-mono">{parseFloat(employee.salaire || "0").toLocaleString()} DT</TableCell>
                       <TableCell className="text-right">
                         <Badge variant={getStatusVariant(employee.statut)}>
                           {employee.statut}
@@ -486,7 +466,7 @@ export default function Employee() {
                       <CreditCard className="h-3.5 w-3.5" />
                       <span>Salaire</span>
                     </div>
-                    <span className="font-semibold">{employee.salaire.toLocaleString()} DT</span>
+                    <span className="font-semibold">{parseFloat(employee.salaire || "0").toLocaleString()} DT</span>
                   </div>
                 </div>
               </CardContent>

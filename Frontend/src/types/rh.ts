@@ -1,7 +1,7 @@
 // From GestionEmployee.tsx
 export interface Employee {
-    password: string | number | readonly string[];
     id: number;
+    password?: string;
     code: string;
     nom: string;
     prenom: string;
@@ -9,20 +9,21 @@ export interface Employee {
     poste: string;
     departement: string;
     dateEmbauche: string;
-    salaire: number;
+    salaire: string; // API defines as decimal string
     statut: "Actif" | "Inactif" | "En congé";
+    user?: number;
 }
 
 // From CongesPage.tsx
 export interface LeaveRequest {
     id: number;
     code: string;
-    employe: string;
+    employe: string; // ReadOnly name
     debut: string;
     fin: string;
-    jours: number;
+    jours: string; // API defines as decimal string
     type: string;
-    motif?: string;
+    motif?: string | null;
     statut: "En attente" | "Approuvé" | "Refusé";
 }
 
@@ -30,12 +31,12 @@ export interface LeaveRequest {
 export interface TimeRecord {
     id: number;
     code: string;
-    employe: string;
+    employe: string; // ReadOnly name
     date: string;
     heureEntree: string;
     heureSortie: string;
     lieu: string;
-    heures: number;
+    heures: string; // API defines as decimal string
     type: string;
     statut: string;
     hsValide: boolean;
@@ -45,10 +46,10 @@ export interface TimeRecord {
 export interface ExpenseReport {
     id: number;
     code: string;
-    employe: string;
+    employe: string; // ReadOnly name
     date: string;
     designation: string;
-    montant: number;
+    montant: string; // API defines as decimal string
     projet: string;
     type: string;
     statut: "En attente" | "Validé" | "Refusé";
@@ -58,10 +59,10 @@ export interface ExpenseReport {
 export interface Authorization {
     id: number;
     code: string;
-    employe: string;
+    employe: string; // ReadOnly name
     date: string;
-    duree: string; // Format "2h"
+    duree: string;
     type: string;
-    motif?: string;
+    motif?: string | null;
     statut: "En attente" | "Approuvé" | "Refusé";
 }

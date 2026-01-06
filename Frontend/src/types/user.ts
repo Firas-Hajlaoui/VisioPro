@@ -1,10 +1,10 @@
 export interface User {
-    id: string;
+    id: string; // API defines as string (though backend might be int, spec says string for ID in User schema? Wait. User schema says id: string readOnly. OK)
     firstName: string;
     lastName: string;
     email: string;
     role: "admin" | "employee" | "manager";
-    departement: string;
+    departement?: string | null;
 }
 
 // Helper function to get full name

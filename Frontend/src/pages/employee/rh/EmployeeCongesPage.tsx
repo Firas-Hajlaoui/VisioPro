@@ -11,6 +11,8 @@ import { ArrowLeft, Calendar, Plus, Send, CheckCircle, Hourglass, PieChart, Cloc
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { generateFormCode } from "@/lib/codification";
+import { useLeaveRequests } from "@/hooks/useApi";
+import type { LeaveRequest } from "@/types/rh";
 
 // Shared Components
 import { StatCard } from "@/components/shared/StatCard";
@@ -28,18 +30,16 @@ const EmployeeCongesPage = () => {
     remarques: ""
   });
 
-  const [mesConges, setMesConges] = useState([
-    { id: 1, code: "RH-CG-2024-0008", type: "Congé annuel", debut: "2024-02-01", fin: "2024-02-05", jours: 5, statut: "Approuvé" },
-    { id: 2, code: "RH-CG-2024-0012", type: "Congé maladie", debut: "2024-01-20", fin: "2024-01-21", jours: 2, statut: "Approuvé" },
-    { id: 3, code: "RH-CG-2024-0015", type: "Congé annuel", debut: "2024-03-15", fin: "2024-03-20", jours: 6, statut: "En attente" },
-    { id: 4, code: "RH-CG-2024-0019", type: "Congé sans solde", debut: "2024-04-10", fin: "2024-04-12", jours: 3, statut: "En attente" },
-  ]);
+  // API Call
+  // Assuming the user can see their own requests
+  const { data: leavesData, isLoading, createLeaveRequest } = useLeaveRequests();
+  const mesConges = leavesData?.results || [];
 
   // --- Filtres ---
   const [filterText, setFilterText] = useState("");
   const [filterStatus, setFilterStatus] = useState("tous");
 
-  const filteredConges = mesConges.filter((item) => {
+  const filteredConges = mesConges.filter((item: LeaveRequest) => {
     const matchText =
       item.code.toLowerCase().includes(filterText.toLowerCase()) ||
       item.type.toLowerCase().includes(filterText.toLowerCase());
@@ -47,34 +47,6 @@ const EmployeeCongesPage = () => {
 
     return matchText && matchStatus;
   });
-
-  // --- Logique ---
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const code = generateFormCode("RH", "CONGE");
-
-    const days = calculateDays();
-    const newRequest = {
-      id: mesConges.length + 1,
-      code: code,
-      type: formData.typeConge === "annuel" ? "Congé annuel" : formData.typeConge, // Simplification pour l'affichage
-      debut: formData.dateDebut,
-      fin: formData.dateFin,
-      jours: days,
-      statut: "En attente"
-    };
-
-    setMesConges([newRequest, ...mesConges]);
-    toast.success(`Demande de congé soumise: ${code}`);
-
-    setFormData({
-      typeConge: "",
-      dateDebut: "",
-      dateFin: "",
-      motif: "",
-      remarques: ""
-    });
-  };
 
   const calculateDays = () => {
     if (formData.dateDebut && formData.dateFin) {
@@ -86,31 +58,52 @@ const EmployeeCongesPage = () => {
     return 0;
   };
 
+  // --- Logique ---
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const code = generateFormCode("RH", "CONGE");
+    const days = calculateDays();
+
+    // Map to API Interface
+    // LeaveRequest in rh.ts: code, debut, fin, jours (string), type, statut
+    createLeaveRequest({
+      code: code,
+      type: formData.typeConge === "annuel" ? "Congé annuel" : formData.typeConge, // Assuming simple mapping for now
+      debut: formData.dateDebut,
+      fin: formData.dateFin,
+      jours: days.toString(), // Convert number to string for decimal format
+      statut: "En attente", // Default status
+      motif: formData.motif
+    });
+
+    setFormData({
+      typeConge: "",
+      dateDebut: "",
+      dateFin: "",
+      motif: "",
+      remarques: ""
+    });
+  };
+
   const getStatusBadgeVariant = (statut: string) => {
-    if (statut === "Approuvé") return "default"; // green usually handled by className or variant
+    if (statut === "Approuvé") return "default";
     if (statut === "En attente") return "secondary";
     return "destructive";
   };
-  // Since StatCard expects Lucide icons, we can reuse them.
 
   // --- DataTable Config ---
-  const columns: Column<any>[] = [
+  const columns: Column<LeaveRequest>[] = [
     { header: "Code", accessorKey: "code", className: "font-mono text-xs text-muted-foreground" },
     { header: "Type", accessorKey: "type", className: "font-medium" },
     { header: "Du", accessorKey: "debut" },
     { header: "Au", accessorKey: "fin" },
-    { header: "Durée", accessorKey: "jours", cell: (row) => <span className="font-bold">{row.jours} j</span> },
+    { header: "Durée", accessorKey: "jours", cell: (row) => <span className="font-bold">{parseFloat(row.jours).toFixed(1)} j</span> },
     {
       header: "Statut",
       accessorKey: "statut",
       className: "text-right",
       cell: (row) => {
         const variant = getStatusBadgeVariant(row.statut);
-        // Custom color adjustment for "Approuvé" if "default" isn't green enough, 
-        // but for now relying on shared Badge variants. 
-        // "default" is typically primary color (black/dark). 
-        // Previous code had explicit colors. 
-        // I will use standard Badge for consistency.
         return (
           <Badge variant={variant === 'default' ? 'default' : variant as any}>
             {variant === 'default' && <CheckCircle className="w-3 h-3 mr-1 inline" />}
@@ -135,6 +128,8 @@ const EmployeeCongesPage = () => {
       ]
     }
   ];
+
+  if (isLoading) return <div className="p-8">Chargement...</div>;
 
   return (
     <div className="container mx-auto p-2 sm:p-4 md:p-6 space-y-6 max-w-5xl pb-20">
@@ -170,14 +165,14 @@ const EmployeeCongesPage = () => {
         />
         <StatCard
           title="Déjà pris"
-          value="8 jours"
+          value={`${mesConges.filter((l: LeaveRequest) => l.statut === "Approuvé").length} jours`} // Simple count for now
           description="Cumul"
           icon={CalendarDays}
           className="text-blue-600"
         />
         <StatCard
           title="En attente"
-          value="6 jours"
+          value={`${mesConges.filter((l: LeaveRequest) => l.statut === "En attente").length} demandes`}
           description="Demandes en cours"
           icon={Clock}
           className="text-orange-500"
@@ -307,7 +302,7 @@ const EmployeeCongesPage = () => {
           {filteredConges.length === 0 && (
             <div className="text-center py-8 text-muted-foreground bg-muted/20 rounded-lg">Aucune demande</div>
           )}
-          {filteredConges.map((item) => (
+          {filteredConges.map((item: LeaveRequest) => (
             <MobileDataCard
               key={item.id}
               title={item.type}
@@ -316,7 +311,7 @@ const EmployeeCongesPage = () => {
               data={[
                 { icon: <span className="text-[10px] text-muted-foreground uppercase w-10">Début</span>, value: item.debut },
                 { icon: <span className="text-[10px] text-muted-foreground uppercase w-10">Fin</span>, value: item.fin },
-                { icon: <span className="text-muted-foreground">Durée</span>, value: `${item.jours} jours` },
+                { icon: <span className="text-muted-foreground">Durée</span>, value: `${parseFloat(item.jours).toFixed(1)} jours` },
               ]}
             />
           ))}

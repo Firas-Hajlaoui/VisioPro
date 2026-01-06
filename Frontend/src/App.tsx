@@ -37,6 +37,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+      <AuthProvider>
+
         <Routes>
           {/* Root redirect to login */}
           <Route path="/" element={<Navigate to="/login" replace />} />
@@ -83,6 +85,7 @@ const App = () => (
             </AppLayout>
           } />
         </Routes>
+      </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

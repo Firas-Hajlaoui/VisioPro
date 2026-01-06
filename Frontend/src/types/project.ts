@@ -7,25 +7,16 @@ export interface ProjectDoc {
 }
 
 export interface Project {
-    documents?: any;
-    id: number;
+    id: number; // API: integer
     code: string;
     intitule: string;
     client: string;
     chefProjet: string;
     dateDebut: string;
     dateFin: string;
-    description?: string;
+    description?: string | null;
     progression: number;
     statut: "En cours" | "Terminé" | "En pause" | "Annulé";
-    // Statistics for Admin Dashboard
-    stats?: {
-        devis: number;
-        fiches: number;
-        technique: number;
-        backup: number;
-    };
-    // Detailed documents list for Employee View
+    stats?: string; // API defines as string (json string?) or readOnly. keeping loose for now as API says string.
     docsList?: ProjectDoc[];
-    
 }
