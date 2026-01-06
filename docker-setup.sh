@@ -17,7 +17,7 @@ fi
 echo -e "${GREEN}✓ Docker is installed${NC}"
 
 # Check if Docker Compose is installed
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker compose &> /dev/null; then
     echo -e "${RED}❌ Docker Compose is not installed. Please install Docker Compose first.${NC}"
     exit 1
 fi
@@ -35,7 +35,7 @@ fi
 
 # Build images
 echo -e "${YELLOW}🔨 Building Docker images...${NC}"
-docker-compose build
+docker compose build
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓ Images built successfully${NC}\n"
@@ -46,7 +46,7 @@ fi
 
 # Start containers
 echo -e "${YELLOW}🚀 Starting containers...${NC}"
-docker-compose up -d
+docker compose up -d
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓ Containers started successfully${NC}\n"
@@ -61,7 +61,7 @@ sleep 10
 
 # Check if services are running
 echo -e "\n${YELLOW}📊 Service Status:${NC}"
-docker-compose ps
+docker compose ps
 
 echo -e "\n${GREEN}✅ Setup completed successfully!${NC}\n"
 
@@ -72,7 +72,7 @@ echo "   • Adminer:   ${GREEN}http://localhost:8080${NC}"
 echo "   • API Docs:  ${GREEN}http://localhost:8000/api/docs${NC}\n"
 
 echo -e "${YELLOW}💡 Useful commands:${NC}"
-echo "   • View logs:        ${GREEN}docker-compose logs -f${NC}"
-echo "   • Stop services:    ${GREEN}docker-compose down${NC}"
-echo "   • Restart service:  ${GREEN}docker-compose restart <service>${NC}"
-echo "   • Create superuser: ${GREEN}docker-compose exec backend python manage.py createsuperuser${NC}"
+echo "   • View logs:        ${GREEN}docker compose logs -f${NC}"
+echo "   • Stop services:    ${GREEN}docker compose down${NC}"
+echo "   • Restart service:  ${GREEN}docker compose restart <service>${NC}"
+echo "   • Create superuser: ${GREEN}docker compose exec backend python manage.py createsuperuser${NC}"
