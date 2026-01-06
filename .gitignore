@@ -1,0 +1,63 @@
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.pyc
+.python-version
+pip-wheel-metadata/
+*.egg-info/
+*.egg
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+/Backend/db.sqlite3
+/media/
+/Backend/media/
+/logs/
+staticfiles/
+
+# Tests
+.pytest_cache/
+coverage.xml
+htmlcov/
+
+# VS Code
+.vscode/
+
+# JetBrains
+.idea/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+.turbo/
+/.parcel-cache/
+/.pnp/
+/.pnp.js
+
+# bun
+bun.lockb
+
+# Environment variables
+.env
+.env.*
+
+# Caches
+.mypy_cache/
+.ruff_cache/
+.cache/
+
+# Logs
+*.log
